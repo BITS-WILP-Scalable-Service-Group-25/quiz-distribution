@@ -10,4 +10,4 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
-          args: "🚀 **New Commit in ${{ github.repository }}**\n📜 **Commit by:** ${{ github.actor }}\n🌿 **Branch:** ${{ github.ref_name }}\n✏ **Message:** ${{ github.event.head_commit.message }}\n🔗"
+          args: "🚀 **New Commit in ${{ github.repository }}**\n📜 **Commit by:** ${{ github.actor }}\n🌿 **Branch:** ${{ github.ref_name }}\n✏ **Message:** ${{ github.event.head_commit.message }}\n"
