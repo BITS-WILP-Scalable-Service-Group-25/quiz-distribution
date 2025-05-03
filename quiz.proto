@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package quizmanagement;
+
+service QuizService {
+  rpc CreateQuiz (CreateQuizRequest) returns (QuizResponse);
+  rpc GetQuiz (GetQuizRequest) returns (QuizResponse);
+  rpc ListQuizzes (ListQuizzesRequest) returns (ListQuizzesResponse);
+  rpc DeleteQuiz (DeleteQuizRequest) returns (DeleteQuizResponse);
+}
+
+service QuestionService {
+  rpc CreateQuestion (CreateQuestionRequest) returns (QuestionResponse);
+  rpc GetQuestion (GetQuestionRequest) returns (QuestionResponse);
+  rpc ListQuestions (ListQuestionsRequest) returns (ListQuestionsResponse);
+  rpc UpdateQuestion (UpdateQuestionRequest) returns (QuestionResponse);
+  rpc DeleteQuestion (DeleteQuestionRequest) returns (DeleteQuestionResponse);
+}
+
+/* === Messages for Quizzes === */
+message CreateQuizRequest {
+  string title = 1;
+  string description = 2;
+  string createdBy = 3;
+}
+
+message QuizResponse {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  repeated QuestionResponse questions = 4;
+}
+
+message QuizResponseMin {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+}
+
+message GetQuizRequest {
+  string id = 1;
+}
+
+message ListQuizzesRequest {}
+
+message ListQuizzesResponse {
+  repeated QuizResponseMin quizzes = 1;
+}
+
+message DeleteQuizRequest {
+  string id = 1;
+}
+
+message DeleteQuizResponse {
+  bool status = 1;
+}
+
+/* === Messages for Questions === */
+message CreateQuestionRequest {
+  string quizId = 1;
+  string text = 2;
+  repeated string options = 3;
+  int32 correctAnswer = 4;
+  string type = 5;
+}
+
+message QuestionResponse {
+  string id = 1;
+  string text = 2;
+  repeated string options = 3;
+  int32 correctAnswer = 4;
+  string type = 5;
+}
+
+message GetQuestionRequest {
+  string quizId = 1;
+  string id = 2;
+}
+
+message ListQuestionsRequest {
+  string quizId = 1;
+}
+
+message ListQuestionsResponse {
+  repeated QuestionResponse questions = 1;
+}
+
+message UpdateQuestionRequest {
+  string quizId = 1;
+  string id = 2;
+  string text = 3;
+  repeated string options = 4;
+  int32 correctAnswer = 5;
+  string type = 6;
+}
+
+message DeleteQuestionRequest {
+  string quizId = 1;
+  string id = 2;
+}
+
+message DeleteQuestionResponse {
+  bool status = 1;
+  string message = 2;
+}
