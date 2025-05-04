@@ -1,33 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quiz-delivery
+  name: quiz-distribution
   labels:
-    app: quiz-delivery
+    app: quiz-distribution
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: quiz-delivery
+      app: quiz-distribution
   template:
     metadata:
       labels:
-        app: quiz-delivery
+        app: quiz-distribution
     spec:
       containers:
-        - name: quiz-delivery
-          image: quiz-delivery:latest
+        - name: quiz-distribution
+          image: quiz-distribution:latest
           imagePullPolicy: Never
           ports:
             - containerPort: 3000
           env:
             - name: PORT
               value: "3000"
-            - name: GRPC_SERVICE_HOST
+            - name: QUIZ_MANAGEMENT_GRPC
               valueFrom:
                 configMapKeyRef:
-                  name: quiz-delivery-config
-                  key: grpc_service_host
+                  name: quiz-distribution-config
+                  key: quiz_management_grpc
           resources:
             requests:
               memory: "128Mi"
