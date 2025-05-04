@@ -19,10 +19,10 @@ spec:
           image: quiz-distribution:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 3000
+            - containerPort: 5003
           env:
             - name: PORT
-              value: "3000"
+              value: "5003"
             - name: QUIZ_MANAGEMENT_GRPC
               valueFrom:
                 configMapKeyRef:
