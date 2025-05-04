@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: quiz-distribution-config
 data:
-  quiz_management_grpc: "100.93.156.127:50052"
+  quiz_management_grpc: "10.102.86.215:50052"
