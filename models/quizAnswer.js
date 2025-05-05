@@ -19,6 +19,23 @@ const quizAnswerSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+  reviewedBy: {
+    type: String,
+    default: null,
+  },
+  reviewedAt: {
+    type: Date,
+    default: null,
+  },
+  feedback: {
+    type: String,
+    default: null,
+  },
 });
 
 module.exports = mongoose.model("QuizAnswer", quizAnswerSchema);

@@ -152,6 +152,173 @@ socket.on("quiz-graded", (data) => {
   }
 });
 
+// Navigation functions
+function showQuizList() {
+  document.querySelector(".nav-tabs .nav-link").classList.add("active");
+  document
+    .querySelector(".nav-tabs .nav-link:last-child")
+    .classList.remove("active");
+  document.getElementById("quizList").style.display = "flex";
+  document.getElementById("quizContent").style.display = "none";
+  document.getElementById("reviewSection").style.display = "none";
+  loadQuizzes();
+}
+
+function showReviewPage() {
+  document.querySelector(".nav-tabs .nav-link").classList.remove("active");
+  document
+    .querySelector(".nav-tabs .nav-link:last-child")
+    .classList.add("active");
+  document.getElementById("quizList").style.display = "none";
+  document.getElementById("quizContent").style.display = "none";
+  document.getElementById("reviewSection").style.display = "block";
+  loadQuizzesForReview();
+}
+
+// Load quizzes for review dropdown
+async function loadQuizzesForReview() {
+  try {
+    const response = await fetch("/api/quiz", {
+      headers: {
+        "x-auth": authToken,
+      },
+    });
+    if (response.status === 401) {
+      alert("Please log in to view quizzes");
+      return;
+    }
+    const quizzes = await response.json();
+    const quizSelector = document.getElementById("quizSelector");
+    quizSelector.innerHTML =
+      '<option value="">Select a quiz to review</option>';
+
+    quizzes.forEach((quiz) => {
+      const option = document.createElement("option");
+      option.value = quiz.id;
+      option.textContent = quiz.title;
+      quizSelector.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error loading quizzes:", error);
+  }
+}
+
+// Load submissions for a specific quiz
+async function loadSubmissions(quizId) {
+  if (!quizId) return;
+
+  try {
+    const response = await fetch(`/api/quiz/${quizId}/submissions`, {
+      headers: {
+        "x-auth": authToken,
+      },
+    });
+
+    if (response.status === 401) {
+      alert("Please log in to view submissions");
+      return;
+    }
+
+    if (response.status === 403) {
+      alert("You are not authorized to view submissions");
+      return;
+    }
+
+    const submissions = await response.json();
+    const submissionsList = document.getElementById("submissionsList");
+    submissionsList.innerHTML = "";
+
+    submissions.forEach((submission) => {
+      const submissionCard = document.createElement("div");
+      submissionCard.className = "submission-card p-3 mb-3";
+      submissionCard.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5>Student ID: ${submission.studentId}</h5>
+          <span class="status-${
+            submission.status
+          }">${submission.status.toUpperCase()}</span>
+        </div>
+        <p>Submitted: ${new Date(submission.submittedAt).toLocaleString()}</p>
+        ${
+          submission.reviewedAt
+            ? `<p>Reviewed: ${new Date(
+                submission.reviewedAt
+              ).toLocaleString()}</p>`
+            : ""
+        }
+        ${submission.feedback ? `<p>Feedback: ${submission.feedback}</p>` : ""}
+        ${
+          submission.status === "pending"
+            ? `
+          <div class="mt-3">
+            <textarea class="form-control mb-2" placeholder="Enter feedback..." id="feedback-${submission._id}"></textarea>
+            <button class="btn btn-success me-2" onclick="reviewSubmission('${quizId}', '${submission._id}', 'approved')">
+              Approve
+            </button>
+            <button class="btn btn-danger" onclick="reviewSubmission('${quizId}', '${submission._id}', 'rejected')">
+              Reject
+            </button>
+          </div>
+        `
+            : ""
+        }
+      `;
+      submissionsList.appendChild(submissionCard);
+    });
+
+    if (submissions.length === 0) {
+      submissionsList.innerHTML = "<p>No submissions found for this quiz.</p>";
+    }
+  } catch (error) {
+    console.error("Error loading submissions:", error);
+    alert("Error loading submissions. Please try again.");
+  }
+}
+
+// Review a submission
+async function reviewSubmission(quizId, submissionId, status) {
+  try {
+    const feedbackElement = document.getElementById(`feedback-${submissionId}`);
+    const feedback = feedbackElement ? feedbackElement.value : "";
+
+    const response = await fetch(
+      `/api/quiz/${quizId}/submissions/${submissionId}/review`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth": authToken,
+        },
+        body: JSON.stringify({
+          status,
+          feedback,
+        }),
+      }
+    );
+
+    if (response.status === 401) {
+      alert("Your session has expired. Please log in again.");
+      return;
+    }
+
+    if (response.status === 403) {
+      alert("You are not authorized to review submissions");
+      return;
+    }
+
+    if (response.ok) {
+      alert(`Submission ${status} successfully!`);
+      loadSubmissions(quizId);
+    } else {
+      const error = await response.json();
+      alert(error.error || "Failed to review submission");
+    }
+  } catch (error) {
+    console.error("Error reviewing submission:", error);
+    alert("Failed to review submission. Please try again.");
+  }
+}
+
 // Handle login form submission
 async function handleLogin(event) {
   event.preventDefault();
@@ -205,6 +372,15 @@ function init() {
     document.getElementById("mainContent").style.display = "none";
   }
 }
+
+// Listen for submission review notifications
+socket.on("submission-reviewed", (data) => {
+  alert(
+    `Your quiz submission has been ${data.status}. ${
+      data.feedback ? `Feedback: ${data.feedback}` : ""
+    }`
+  );
+});
 
 // Initialize the app
 init();

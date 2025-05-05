@@ -22,6 +22,20 @@
         border: 1px solid #dee2e6;
         border-radius: 0.5rem;
       }
+      .submission-card {
+        margin-bottom: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+      }
+      .status-pending {
+        color: #ffc107;
+      }
+      .status-approved {
+        color: #198754;
+      }
+      .status-rejected {
+        color: #dc3545;
+      }
     </style>
   </head>
   <body>
@@ -49,9 +63,24 @@
 
       <!-- Main Content (Hidden until authenticated) -->
       <div id="mainContent" style="display: none">
-        <h1>Available Quizzes</h1>
+        <!-- Navigation -->
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item">
+            <a class="nav-link active" href="#" onclick="showQuizList()"
+              >Available Quizzes</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="showReviewPage()"
+              >Review Submissions</a
+            >
+          </li>
+        </ul>
+
+        <!-- Quiz List Section -->
         <div id="quizList" class="row"></div>
 
+        <!-- Quiz Content Section -->
         <div id="quizContent" style="display: none">
           <h2 id="quizTitle"></h2>
           <p id="quizDescription"></p>
@@ -66,6 +95,23 @@
               Back to Quizzes
             </button>
           </form>
+        </div>
+
+        <!-- Review Section -->
+        <div id="reviewSection" style="display: none">
+          <h2>Review Submissions</h2>
+          <div class="mb-3">
+            <select
+              id="quizSelector"
+              class="form-select"
+              onchange="loadSubmissions(this.value)"
+            >
+              <option value="">Select a quiz to review</option>
+            </select>
+          </div>
+          <div id="submissionsList" class="mt-4">
+            <!-- Submissions will be loaded here -->
+          </div>
         </div>
       </div>
     </div>
