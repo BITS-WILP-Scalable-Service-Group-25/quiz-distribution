@@ -28,13 +28,15 @@ message QuizResponse {
   string id = 1;
   string title = 2;
   string description = 3;
-  repeated QuestionResponse questions = 4;
+  string createdBy = 4;
+  repeated QuestionResponse questions = 5;
 }
 
 message QuizResponseMin {
   string id = 1;
   string title = 2;
   string description = 3;
+  string createdBy = 4;
 }
 
 message GetQuizRequest {
