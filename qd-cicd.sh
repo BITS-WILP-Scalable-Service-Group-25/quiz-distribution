@@ -21,7 +21,7 @@ log "=== Starting deployment for $SERVICE_NAME ==="
 
 
 log "Pulling latest code from Git..."
-#git pull origin main 2>&1 | tee -a "$LOG_FILE"
+git pull origin main 2>&1 | tee -a "$LOG_FILE"
 
 
 log "Switching to Minikube's Docker environment..."
