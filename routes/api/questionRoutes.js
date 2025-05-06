@@ -2,7 +2,64 @@ const express = require("express");
 const router = express.Router();
 const { authenticateToken } = require("../../middleware/auth");
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Question:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *         text:
+ *           type: string
+ *         options:
+ *           type: array
+ *           items:
+ *             type: string
+ *         correctAnswer:
+ *           type: integer
+ *         type:
+ *           type: string
+ *       required:
+ *         - text
+ *         - options
+ *         - correctAnswer
+ *         - type
+ */
+
 module.exports = (questionServiceClient) => {
+  /**
+   * @openapi
+   * /api/quiz/{quizId}/questions:
+   *   post:
+   *     summary: Add a question to a quiz
+   *     security:
+   *       - BearerAuth: []
+   *     tags:
+   *       - Questions
+   *     parameters:
+   *       - in: path
+   *         name: quizId
+   *         required: true
+   *         schema:
+   *           type: string
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/Question'
+   *     responses:
+   *       201:
+   *         description: Question created successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Question'
+   *       401:
+   *         description: Unauthorized
+   */
   router.post("/:quizId/questions", authenticateToken, (req, res) => {
     const { text, options, correctAnswer, type } = req.body;
     const createQuestionRequest = {
@@ -25,6 +82,33 @@ module.exports = (questionServiceClient) => {
     );
   });
 
+  /**
+   * @openapi
+   * /api/quiz/{quizId}/questions:
+   *   get:
+   *     summary: Get all questions for a quiz
+   *     security:
+   *       - BearerAuth: []
+   *     tags:
+   *       - Questions
+   *     parameters:
+   *       - in: path
+   *         name: quizId
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: List of questions
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/Question'
+   *       401:
+   *         description: Unauthorized
+   */
   router.get("/:quizId/questions", authenticateToken, (req, res) => {
     questionServiceClient.listQuestions(
       { quizId: req.params.quizId },
@@ -38,6 +122,36 @@ module.exports = (questionServiceClient) => {
     );
   });
 
+  /**
+   * @openapi
+   * /api/quiz/{quizId}/questions/{id}:
+   *   get:
+   *     summary: Get a specific question
+   *     security:
+   *       - BearerAuth: []
+   *     tags:
+   *       - Questions
+   *     parameters:
+   *       - in: path
+   *         name: quizId
+   *         required: true
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Question details
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Question'
+   *       404:
+   *         description: Question not found
+   */
   router.get("/:quizId/questions/:id", authenticateToken, (req, res) => {
     const { quizId, id } = req.params;
     questionServiceClient.getQuestion({ quizId, id }, (error, response) => {
@@ -49,6 +163,42 @@ module.exports = (questionServiceClient) => {
     });
   });
 
+  /**
+   * @openapi
+   * /api/quiz/{quizId}/questions/{id}:
+   *   put:
+   *     summary: Update a question
+   *     security:
+   *       - BearerAuth: []
+   *     tags:
+   *       - Questions
+   *     parameters:
+   *       - in: path
+   *         name: quizId
+   *         required: true
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/Question'
+   *     responses:
+   *       200:
+   *         description: Question updated successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Question'
+   *       404:
+   *         description: Question not found
+   */
   router.put("/:quizId/questions/:id", authenticateToken, (req, res) => {
     const { text, options, correctAnswer, type } = req.body;
     const { quizId, id } = req.params;
@@ -73,6 +223,32 @@ module.exports = (questionServiceClient) => {
     );
   });
 
+  /**
+   * @openapi
+   * /api/quiz/{quizId}/questions/{id}:
+   *   delete:
+   *     summary: Delete a question
+   *     security:
+   *       - BearerAuth: []
+   *     tags:
+   *       - Questions
+   *     parameters:
+   *       - in: path
+   *         name: quizId
+   *         required: true
+   *         schema:
+   *           type: string
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Question deleted successfully
+   *       404:
+   *         description: Question not found
+   */
   router.delete("/:quizId/questions/:id", authenticateToken, (req, res) => {
     const { quizId, id } = req.params;
     questionServiceClient.deleteQuestion({ quizId, id }, (error, response) => {
